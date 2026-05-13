@@ -54,4 +54,3 @@ void AFloor::Tick(float DeltaTime)
 		Destroy();
 	}
 }
-
