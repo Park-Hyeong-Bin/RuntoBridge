@@ -42,5 +42,16 @@ void AFloor::BeginPlay()
 void AFloor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	//매프레임 x 축 마이너스 방향으로 플레이어 반대방향으로 이동
+	FVector NewLocation = GetActorLocation();
+	NewLocation.X -= MoveSpeed * DeltaTime;
+	//바닥 위치 업데이트너가 
+	SetActorLocation(NewLocation);
+	
+	// 2. 만약 지정된 파괴 위치보다 더 뒤로 갔다면 메모리 관리를 위해 제거
+	if (NewLocation.X <= DestroyLocationX){
+		Destroy();
+	}
 }
 
