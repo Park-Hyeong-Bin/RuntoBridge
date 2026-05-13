@@ -41,4 +41,7 @@ protected:
 private:
 	// 마지막으로 속도가 증가한 이후 경과된 시간
 	float TimerCount;
+
+	// 고정할 플레이어의 X 좌표
+	float FixedPlayerX;
 };
