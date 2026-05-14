@@ -19,8 +19,20 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	// 점수 추가 함수
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	void AddScore(int32 Amount);
+
+	// 현재 점수 가져오기
+	UFUNCTION(BlueprintPure, Category = "Score")
+	int32 GetScore() const { return Score; }
+
 protected:
 	virtual void BeginPlay() override;
+
+	// 현재 점수
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
+	int32 Score;
 
 	// 현재 게임 속도 배율
 	UPROPERTY(BlueprintReadWrite, Category = "GameSpeed")
@@ -44,4 +56,7 @@ private:
 
 	// 고정할 플레이어의 X 좌표
 	float FixedPlayerX;
+
+	// 틱 카운터 (점수 계산용)
+	int32 TickCounter;
 };

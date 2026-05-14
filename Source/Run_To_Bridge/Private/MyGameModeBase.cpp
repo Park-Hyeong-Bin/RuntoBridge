@@ -10,11 +10,13 @@ AMyGameModeBase::AMyGameModeBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// 초기값 설정
+	Score = 0;
 	CurrentSpeed = 1.5f;           // 시작 속도 1.5배속
 	SpeedIncreaseAmount = 0.1f;    // 10%씩 증가
 	SpeedIncreaseInterval = 20.0f; // 20초마다
 	MaxSpeed = 4.0f;               // 최대 4배속
 	TimerCount = 0.0f;
+	TickCounter = 0;
 }
 
 void AMyGameModeBase::BeginPlay()
@@ -80,5 +82,23 @@ void AMyGameModeBase::Tick(float DeltaTime)
 
 		// 로그 출력 (디버깅용)
 		UE_LOG(LogTemp, Warning, TEXT("Game Speed Increased! Current Speed: %f"), CurrentSpeed);
+	}
+
+	// 2틱당 1점 추가 로직
+	TickCounter++;
+	if (TickCounter >= 2)
+	{
+		AddScore(1);
+		TickCounter = 0;
+	}
+}
+
+void AMyGameModeBase::AddScore(int32 Amount)
+{
+	Score += Amount;
+	
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Yellow, FString::Printf(TEXT("Score: %d"), Score));
 	}
 }

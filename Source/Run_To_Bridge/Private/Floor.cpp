@@ -56,9 +56,4 @@ void AFloor::Tick(float DeltaTime)
 	// TeleportPhysics 옵션을 사용하여 이동 시 물리적 마찰이나 충돌 반작용(밀림)을 최소화합니다.
 	// 이 옵션은 물리 엔진이 액터의 '속도'를 계산하여 위에 있는 물체를 튕겨내는 것을 방지합니다.
 	SetActorLocation(NewLocation, false, nullptr, ETeleportType::TeleportPhysics);
-	
-	// 2. 만약 지정된 파괴 위치보다 더 뒤로 갔다면 메모리 관리를 위해 제거
-	if (NewLocation.X <= DestroyLocationX){
-		Destroy();
-	}
 }

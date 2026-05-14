@@ -35,7 +35,4 @@ public:
 	// 바닥이 뒤로 흐르는 속도
 	UPROPERTY(EditAnywhere)
 	float MoveSpeed = 600.0f;
-	// 이 위치보다 뒤로 가면 스스로 파괴됨 (예: 캐릭터 뒤쪽)
-	UPROPERTY(EditAnywhere)
-	float DestroyLocationX = -400.0f;
 };
