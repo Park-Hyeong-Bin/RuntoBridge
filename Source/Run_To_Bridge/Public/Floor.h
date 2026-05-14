@@ -37,5 +37,5 @@ public:
 	float MoveSpeed = 600.0f;
 	// 이 위치보다 뒤로 가면 스스로 파괴됨 (예: 캐릭터 뒤쪽)
 	UPROPERTY(EditAnywhere)
-	float DestroyLocationX = -5500.0f;
+	float DestroyLocationX = -400.0f;
 };

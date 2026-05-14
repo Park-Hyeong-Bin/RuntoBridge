@@ -16,6 +16,9 @@ AFloor::AFloor()
 	
 	// 생성한 박스 콜리전 컴포넌트를 최상단 컴포넌트로 설정
 	SetRootComponent(boxComp);
+
+	// 커스텀 콜리전 프로필 설정
+	boxComp->SetCollisionProfileName(TEXT("Floor"));
 	
 	// 스태틱메시 컴포넌트 생성
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("My Mesh Component"));
@@ -23,16 +26,15 @@ AFloor::AFloor()
 	// 박스 콜리전 자식으로 스태틱 메시 컴포넌트 설정
 	meshComp->SetupAttachment(boxComp);
 	
-	// 박스 콜라이더 크기 설정 (두께를 20(10*2)으로 얇게 설정)
-	FVector boxSize = FVector(150.0f, 150.f, 10.f);
+	// 박스 콜라이더 크기 설정 (두께를 으로 얇게 설정)
+	FVector boxSize = FVector(150.0f, 450.f, 25.f);
 	boxComp->SetBoxExtent(boxSize);
 
-	// 메쉬 컴포넌트 설정
-	meshComp->SetRelativeScale3D(FVector(3.f, 3.f, 0.5f));
+	// 메쉬 컴포넌트 크기를 박스 콜라이더와 맞춤 (기본 큐브 100x100x100 기준)
+	meshComp->SetRelativeScale3D(FVector(3.0f, 9.0f, 0.5f));
+
 	
-	// 메쉬의 윗면과 콜리전의 윗면을 일치시키기 위해 메쉬를 아래로 15유닛 내림
-	// (메쉬 높이 50의 절반 25, 콜리전 높이 20의 절반 10 -> 차이 15)
-	meshComp->SetRelativeLocation(FVector(0.f, 0.f, -15.f));
+	
 	}
 
 // Called when the game starts or when spawned
