@@ -51,7 +51,7 @@ void AMyGameModeBase::Tick(float DeltaTime)
 		// 2. 뒤로 밀려난 경우(CurrentLoc.X < FixedPlayerX), 서서히 원래 위치로 복귀
 		else if (CurrentLoc.X < FixedPlayerX)
 		{
-			float RecoverySpeed = 400.0f; // 초당 복귀 속도 (필요에 따라 조절 가능)
+			float RecoverySpeed = 200.0f; // 초당 복귀 속도 (필요에 따라 조절 가능)
 			float NewX = FMath::Min(FixedPlayerX, CurrentLoc.X + RecoverySpeed * DeltaTime);
 			FVector NewLoc = FVector(NewX, CurrentLoc.Y, CurrentLoc.Z);
 			PlayerPawn->SetActorLocation(NewLoc, false, nullptr, ETeleportType::TeleportPhysics);

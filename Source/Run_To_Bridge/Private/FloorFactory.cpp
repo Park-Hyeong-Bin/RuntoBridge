@@ -45,41 +45,59 @@ void AFloorFactory::Tick(float DeltaTime)
 
 void AFloorFactory::SpawnFloor()
 {
-	if (FloorClasses.Num() > 0)
+	if (FloorClasses.Num() <= 0) return;
+
+	TSubclassOf<AActor> ClassToSpawn = nullptr;
+
+	// 1. 이미 연속 스폰 중인지 확인
+	if (ConsecutiveSpawnCount > 0 && CurrentConsecutiveClass != nullptr)
 	{
-		int32 RandomIndex = FMath::RandRange(0, FloorClasses.Num() - 1);
+		ClassToSpawn = CurrentConsecutiveClass;
+		ConsecutiveSpawnCount--;
 		
-		if (FloorClasses[RandomIndex])
+		// 연속 스폰이 모두 끝나면 클래스 정보 초기화
+		if (ConsecutiveSpawnCount <= 0)
 		{
-			FVector SpawnLocation = GetActorLocation();
-			FRotator SpawnRotation = GetActorRotation();
-
-			if (IsValid(LastSpawnedFloor))
-			{
-				SpawnLocation.X = LastSpawnedFloor->GetActorLocation().X + 300.0f;
-			}
-
-			// [추가된 안전 장치]
-			// 만약 계산된 스폰 위치가 플레이어의 위치와 너무 가깝다면(예: 300 유닛 이내),
-			// 플레이어 뒤쪽이나 겹치는 위치에 스폰되지 않도록 강제로 앞쪽으로 밀어냅니다.
-			if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
-			{
-				float PlayerX = PlayerPawn->GetActorLocation().X;
-				// 플레이어 근처(X-300 ~ X+300)에서 스폰되려 한다면 무시하거나 위치를 조정해야 합니다.
-				// 여기서는 캐릭터 겹침 원천 차단을 위해 플레이어 위치보다 항상 앞에 스폰되도록 보정합니다.
-				if (SpawnLocation.X < PlayerX + 150.0f)
-				{
-					// 플레이어보다 최소 150유닛 앞에서 시작하도록 보정
-					// (단, 이 경우 바닥 사이에 틈이 생길 수 있으므로 로그를 남겨 거리를 확인하세요)
-					// SpawnLocation.X = PlayerX + 150.0f; 
-				}
-			}
-			
-			// 스폰 옵션 설정: 겹침이 발생하더라도 일단 무조건 스폰 (물리 밀림은 TeleportPhysics로 해결)
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			
-			LastSpawnedFloor = GetWorld()->SpawnActor<AActor>(FloorClasses[RandomIndex], SpawnLocation, SpawnRotation, SpawnParams);
+			CurrentConsecutiveClass = nullptr;
 		}
+	}
+	else
+	{
+		// 2. 랜덤으로 새로운 바닥 선택
+		int32 RandomIndex = FMath::RandRange(0, FloorClasses.Num() - 1);
+		ClassToSpawn = FloorClasses[RandomIndex];
+
+		// 3. 만약 선택된 클래스가 SpecialConsecutiveClasses 배열에 포함되어 있다면 연속 스폰 카운트 설정
+		if (ClassToSpawn && SpecialConsecutiveClasses.Contains(ClassToSpawn))
+		{
+			CurrentConsecutiveClass = ClassToSpawn;
+			// 방금 하나 뽑았으므로, 앞으로 (Max - 1)번 더 스폰하도록 설정
+			ConsecutiveSpawnCount = MaxConsecutiveSpawns - 1; 
+		}
+	}
+
+	if (ClassToSpawn)
+	{
+		FVector SpawnLocation = GetActorLocation();
+		FRotator SpawnRotation = GetActorRotation();
+
+		if (IsValid(LastSpawnedFloor))
+		{
+			SpawnLocation.X = LastSpawnedFloor->GetActorLocation().X + 300.0f;
+		}
+
+		if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+		{
+			float PlayerX = PlayerPawn->GetActorLocation().X;
+			if (SpawnLocation.X < PlayerX + 150.0f)
+			{
+				// SpawnLocation.X = PlayerX + 150.0f;
+			}
+		}
+		
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		
+		LastSpawnedFloor = GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
 	}
 }

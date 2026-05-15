@@ -34,6 +34,14 @@ public:
 	// 바닥을 생성하는 함수
 	void SpawnFloor();
 
+	// 연속 스폰할 클래스들 (여기에 등록된 클래스가 뽑히면 연속 스폰 시작)
+	UPROPERTY(EditAnywhere, Category = "Spawn Settings")
+	TArray<TSubclassOf<AActor>> SpecialConsecutiveClasses;
+
+	// 연속 스폰할 횟수
+	UPROPERTY(EditAnywhere, Category = "Spawn Settings")
+	int32 MaxConsecutiveSpawns = 5;
+
 private:
 	// 타이머 핸들
 	FTimerHandle SpawnTimerHandle;
@@ -41,4 +49,11 @@ private:
 	// 마지막으로 생성된 바닥을 기억합니다.
 	UPROPERTY()
 	AActor* LastSpawnedFloor;
+
+	// 현재 남은 연속 스폰 횟수
+	int32 ConsecutiveSpawnCount = 0;
+
+	// 현재 연속 스폰 중인 클래스
+	UPROPERTY()
+	TSubclassOf<AActor> CurrentConsecutiveClass = nullptr;
 };
