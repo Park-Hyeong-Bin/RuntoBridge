@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "MainWidget.h"
 #include "MyGameModeBase.generated.h"
 
 /**
@@ -27,8 +28,20 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Score")
 	int32 GetScore() const { return Score; }
 
+	// 점수 UI 업데이트 함수
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	void UpdateScoreUI();
+
+	// 게임 오버 처리 함수
+	UFUNCTION(BlueprintCallable, Category = "GameLogic")
+	void EndGame();
+
 protected:
 	virtual void BeginPlay() override;
+
+	// 게임 오버 여부
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameLogic")
+	bool bIsGameOver;
 
 	// 현재 점수
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
@@ -50,6 +63,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameSpeed")
 	float MaxSpeed;
 
+	// 위젯 클래스 (에디터에서 할당)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UMainWidget> mainWidget;
+
+	// 생성된 위젯 인스턴스 보관
+	UPROPERTY()
+	UMainWidget* mainUI;
+	
 private:
 	// 마지막으로 속도가 증가한 이후 경과된 시간
 	float TimerCount;

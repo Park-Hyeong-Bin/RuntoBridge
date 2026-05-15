@@ -2,6 +2,8 @@
 
 
 #include "MyGameModeBase.h"
+
+#include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 AMyGameModeBase::AMyGameModeBase()
@@ -17,12 +19,15 @@ AMyGameModeBase::AMyGameModeBase()
 	MaxSpeed = 4.0f;               // 최대 4배속
 	TimerCount = 0.0f;
 	TickCounter = 0;
+	bIsGameOver = false;
 }
 
 void AMyGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	bIsGameOver = false;
+
 	// 게임 시작 시 초기 속도 적용
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), CurrentSpeed);
 
@@ -31,14 +36,27 @@ void AMyGameModeBase::BeginPlay()
 	{
 		FixedPlayerX = PlayerPawn->GetActorLocation().X;
 	}
+	
+	if (mainWidget)
+	{
+		mainUI = CreateWidget<UMainWidget>(GetWorld(), mainWidget);
+		if (mainUI)
+		{
+			mainUI->AddToViewport();
+			UpdateScoreUI();
+		}
+	}
 }
 
 void AMyGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsGameOver) return;
+
 	// 캐릭터 위치 관리
-	if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	if (PlayerPawn)
 	{
 		FVector CurrentLoc = PlayerPawn->GetActorLocation();
 		
@@ -56,13 +74,12 @@ void AMyGameModeBase::Tick(float DeltaTime)
 			FVector NewLoc = FVector(NewX, CurrentLoc.Y, CurrentLoc.Z);
 			PlayerPawn->SetActorLocation(NewLoc, false, nullptr, ETeleportType::TeleportPhysics);
 		}
-
-		// 화면에 현재 좌표 표시 (디버깅용)
-		if (GEngine)
-		{
-			FString LocString = FString::Printf(TEXT("Player Fixed X: %.2f | Current X: %.2f, Y: %.2f"), FixedPlayerX, CurrentLoc.X, CurrentLoc.Y);
-			GEngine->AddOnScreenDebugMessage(1, 0.1f, FColor::Cyan, LocString);
-		}
+	}
+	else
+	{
+		// 플레이어가 파괴되었다면 게임 오버 처리
+		EndGame();
+		return;
 	}
 
 	// 타이머 누적 (속도 증가 로직)
@@ -79,9 +96,6 @@ void AMyGameModeBase::Tick(float DeltaTime)
 
 		// 타이머 초기화 (남은 시간은 유지하여 오차 방지)
 		TimerCount -= SpeedIncreaseInterval;
-
-		// 로그 출력 (디버깅용)
-		UE_LOG(LogTemp, Warning, TEXT("Game Speed Increased! Current Speed: %f"), CurrentSpeed);
 	}
 
 	// 2틱당 1점 추가 로직
@@ -95,10 +109,29 @@ void AMyGameModeBase::Tick(float DeltaTime)
 
 void AMyGameModeBase::AddScore(int32 Amount)
 {
+	if (bIsGameOver) return;
+
 	Score += Amount;
 	
-	if (GEngine)
+	UpdateScoreUI();
+}
+
+void AMyGameModeBase::UpdateScoreUI()
+{
+	if (mainUI && mainUI->scoreData)
 	{
-		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Yellow, FString::Printf(TEXT("Score: %d"), Score));
+		mainUI->scoreData->SetText(FText::AsNumber(Score));
 	}
+}
+
+void AMyGameModeBase::EndGame()
+{
+	if (bIsGameOver) return;
+
+	bIsGameOver = true;
+
+	// 게임 일시정지
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+	UE_LOG(LogTemp, Warning, TEXT("Game Over! Final Score: %d"), Score);
 }

@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "MyWidget.generated.h"
-#include "Blueprint/UserWidget.h"
 
 /**
  * 
