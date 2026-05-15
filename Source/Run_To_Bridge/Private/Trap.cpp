@@ -4,6 +4,7 @@
 #include "Trap.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Pawn.h"
+#include "NiagaraComponent.h"
 
 
 // Sets default values
@@ -29,6 +30,12 @@ ATrap::ATrap()
 	
 	// 메시 컴포넌트의 충돌은 비활성화 (충돌은 boxComp가 담당)
 	meshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// 나이아가라 컴포넌트 생성
+	fireComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Fire Niagara Component"));
+	
+	// 박스 콜리전 자식으로 나이아가라 컴포넌트 설정
+	fireComponent->SetupAttachment(boxComp);
 }
 
 // Called when the game starts or when spawned
@@ -38,6 +45,14 @@ void ATrap::BeginPlay()
 	
 	// 오버랩 이벤트 바인딩
 	boxComp->OnComponentBeginOverlap.AddDynamic(this, &ATrap::OnOverlapBegin);
+
+	// fireEffect가 설정되어 있다면 컴포넌트에 할당
+	if (fireEffect && fireComponent)
+	{
+		fireComponent->SetAsset(fireEffect);
+		// 항상 재생되도록 활성화
+		fireComponent->Activate();
+	}
 }
 
 // Called every frame

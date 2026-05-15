@@ -22,6 +22,14 @@ public:
 	// 스태틱 메시 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UStaticMeshComponent* meshComp;
+	
+	//나이아가라 이펙트 슬롯
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
+	class UNiagaraSystem* fireEffect;
+
+	// 나이아가라 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UNiagaraComponent* fireComponent;
 
 protected:
 	// Called when the game starts or when spawned
