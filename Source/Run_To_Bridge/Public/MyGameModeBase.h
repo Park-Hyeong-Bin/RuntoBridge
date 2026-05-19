@@ -67,9 +67,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UMainWidget> mainWidget;
 
+	// 메뉴 위젯 클래스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class UMenuWidget> menuWidgetClass;
+
 	// 생성된 위젯 인스턴스 보관
 	UPROPERTY()
 	UMainWidget* mainUI;
+	
+	UPROPERTY()
+	class UMenuWidget* menuUI;
+
+	// 메뉴 위젯 표시 함수
+	void ShowMenu();
 	
 private:
 	// 마지막으로 속도가 증가한 이후 경과된 시간

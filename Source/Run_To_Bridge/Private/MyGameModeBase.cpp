@@ -5,6 +5,8 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "MenuWidget.h"
+#include "Components/TextBlock.h"
 
 AMyGameModeBase::AMyGameModeBase()
 {
@@ -27,6 +29,18 @@ void AMyGameModeBase::BeginPlay()
 	Super::BeginPlay();
 	
 	bIsGameOver = false;
+
+	// 게임 일시정지 해제 (재시작 시 대비)
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
+
+	// 입력 모드를 게임 전용으로 초기화하고 마우스 커서 숨김
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		PC->bShowMouseCursor = false;
+		FInputModeGameOnly InputMode;
+		PC->SetInputMode(InputMode);
+	}
 
 	// 게임 시작 시 초기 속도 적용
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), CurrentSpeed);
@@ -134,4 +148,34 @@ void AMyGameModeBase::EndGame()
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 
 	UE_LOG(LogTemp, Warning, TEXT("Game Over! Final Score: %d"), Score);
+
+	ShowMenu();
+}
+
+void AMyGameModeBase::ShowMenu()
+{
+	if (menuWidgetClass)
+	{
+		menuUI = CreateWidget<UMenuWidget>(GetWorld(), menuWidgetClass);
+		if (menuUI)
+		{
+			menuUI->AddToViewport();
+			
+			// 점수 표시
+			if (menuUI->score)
+			{
+				menuUI->score->SetText(FText::AsNumber(Score));
+			}
+
+			// 마우스 커서 표시 및 입력 모드 설정
+			APlayerController* PC = GetWorld()->GetFirstPlayerController();
+			if (PC)
+			{
+				PC->bShowMouseCursor = true;
+				FInputModeUIOnly InputMode;
+				InputMode.SetWidgetToFocus(menuUI->TakeWidget());
+				PC->SetInputMode(InputMode);
+			}
+		}
+	}
 }
