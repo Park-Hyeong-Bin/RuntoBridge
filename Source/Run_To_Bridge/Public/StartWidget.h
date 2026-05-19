@@ -4,36 +4,42 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "MenuWidget.generated.h"
+#include "StartWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RUN_TO_BRIDGE_API UMenuWidget : public UUserWidget
+class RUN_TO_BRIDGE_API UStartWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UButton* buttonRestart;
+	class UButton* buttonStart;
 	
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UButton* buttonExit;
-
+	class UButton* buttonStartTutorial;
+	
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UTextBlock* score;
+	class UButton* buttonQuit;
 	
 protected:
-	// 위젯 초기화 함수
 	virtual void NativeConstruct() override;
-	
+
 private:
-	// 재시작 기능
+	// 게임 시작 기능
 	UFUNCTION()
-	void Restart();
+	void StartGame();
+	
+	// 튜토리얼 시작 기능
+	UFUNCTION()
+	void StartTutorial();
 	
 	// 종료 기능
 	UFUNCTION()
-	void Exit();
+	void Quit();
 };
+
+
+

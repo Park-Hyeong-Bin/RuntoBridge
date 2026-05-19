@@ -67,6 +67,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UMainWidget> mainWidget;
 
+	// 시작 화면 위젯 클래스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class UStartWidget> startWidgetClass;
+
 	// 메뉴 위젯 클래스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<class UMenuWidget> menuWidgetClass;

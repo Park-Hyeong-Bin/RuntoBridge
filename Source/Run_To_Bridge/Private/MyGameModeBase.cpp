@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "MenuWidget.h"
+#include "StartWidget.h"
 #include "Components/TextBlock.h"
 
 AMyGameModeBase::AMyGameModeBase()
@@ -33,7 +34,25 @@ void AMyGameModeBase::BeginPlay()
 	// 게임 일시정지 해제 (재시작 시 대비)
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 
-	// 입력 모드를 게임 전용으로 초기화하고 마우스 커서 숨김
+	// 현재 레벨 이름 확인
+	FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+
+	// 메인 메뉴(Bridge) 맵인 경우
+	if (CurrentLevelName.Equals(TEXT("Bridge"), ESearchCase::IgnoreCase))
+	{
+		if (startWidgetClass)
+		{
+			UStartWidget* startUI = CreateWidget<UStartWidget>(GetWorld(), startWidgetClass);
+			if (startUI)
+			{
+				startUI->AddToViewport();
+			}
+		}
+		// 메뉴 맵에서는 게임 로직 관련 초기화(커서 숨김, 플레이어 좌표 저장 등)를 하지 않음
+		return;
+	}
+
+	// 실제 게임 맵인 경우: 입력 모드를 게임 전용으로 초기화하고 마우스 커서 숨김
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if (PC)
 	{
@@ -65,6 +84,9 @@ void AMyGameModeBase::BeginPlay()
 void AMyGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// 메인 메뉴(Bridge) 맵인 경우 게임 로직(캐릭터 위치 제한, 점수 등)을 실행하지 않음
+	if (UGameplayStatics::GetCurrentLevelName(GetWorld()).Equals(TEXT("Bridge"), ESearchCase::IgnoreCase)) return;
 
 	if (bIsGameOver) return;
 

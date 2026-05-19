@@ -12,7 +12,7 @@ void UMenuWidget::NativeConstruct()
 	
 	// 각 버튼 클릭 이벤트에 대응할 함수 연결
 	buttonRestart->OnClicked.AddDynamic(this, &UMenuWidget::Restart);
-	buttonQuit->OnClicked.AddDynamic(this, &UMenuWidget::Quit);
+	buttonExit->OnClicked.AddDynamic(this, &UMenuWidget::Exit);
 }
 
 void UMenuWidget::Restart()
@@ -22,12 +22,8 @@ void UMenuWidget::Restart()
 	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
 }
 
-void UMenuWidget::Quit()
+void UMenuWidget::Exit()
 {
-	// 현재 실행 중인 월드 종료
-	UWorld* currentWorld = GetWorld();
-	
-	// 앱 종료
-	UKismetSystemLibrary::QuitGame(currentWorld, currentWorld->GetFirstPlayerController(),
-		EQuitPreference::Quit, false);
+	// 메인 메뉴(Bridge) 맵으로
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Bridge"));
 }
