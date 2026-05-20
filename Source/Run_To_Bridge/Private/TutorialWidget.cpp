@@ -4,13 +4,13 @@
 #include "TutorialWidget.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
-
 void UTutorialWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+
 	CurrentStep = 0;
 	bMoved = false;
+	bJumped = false;
 	UpdateStep(CurrentStep);
 }
 
@@ -37,6 +37,20 @@ void UTutorialWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 	else if (CurrentStep == 1)
 	{
+		// 스페이스바 입력 감지
+		if (PC->IsInputKeyDown(EKeys::SpaceBar))
+		{
+			bJumped = true;
+		}
+
+		// 키를 뗐을 때 다음 단계로
+		if (bJumped && !PC->IsInputKeyDown(EKeys::SpaceBar))
+		{
+			UpdateStep(2);
+		}
+	}
+	else if (CurrentStep == 2)
+	{
 		// F 키 입력 감지 시 메인 메뉴로 이동 후 종료
 		if (PC->IsInputKeyDown(EKeys::F))
 		{
@@ -58,6 +72,9 @@ void UTutorialWidget::UpdateStep(int32 NewStep)
 		guideText->SetText(FText::FromString(TEXT("A와 D를 이용하여 좌우로 움직일 수 있습니다.")));
 		break;
 	case 1:
+		guideText->SetText(FText::FromString(TEXT("스페이스바를 눌러 점프할 수 있습니다.")));
+		break;
+	case 2:
 		guideText->SetText(FText::FromString(TEXT("F를 눌러 튜토리얼을 종료합니다.")));
 		break;
 	default:

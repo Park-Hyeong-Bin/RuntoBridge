@@ -73,6 +73,12 @@ void AMyGameModeBase::BeginPlay()
 				tutorialUI->AddToViewport();
 			}
 		}
+		
+		// 튜토리얼에서도 X축 고정을 위해 초기 위치 저장
+		if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+		{
+			FixedPlayerX = PlayerPawn->GetActorLocation().X;
+		}
 		return;
 	}
 
@@ -109,12 +115,14 @@ void AMyGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 메인 메뉴(Bridge) 맵인 경우 게임 로직(캐릭터 위치 제한, 점수 등)을 실행하지 않음
-	if (UGameplayStatics::GetCurrentLevelName(GetWorld()).Equals(TEXT("Bridge"), ESearchCase::IgnoreCase)) return;
+	FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+
+	// 메인 메뉴(Bridge) 맵인 경우 게임 로직을 실행하지 않음
+	if (CurrentLevelName.Equals(TEXT("Bridge"), ESearchCase::IgnoreCase)) return;
 
 	if (bIsGameOver) return;
 
-	// 캐릭터 위치 관리
+	// 캐릭터 위치 관리 (실제 게임 및 튜토리얼 모두 적용)
 	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	if (PlayerPawn)
 	{
@@ -129,18 +137,21 @@ void AMyGameModeBase::Tick(float DeltaTime)
 		// 2. 뒤로 밀려난 경우(CurrentLoc.X < FixedPlayerX), 서서히 원래 위치로 복귀
 		else if (CurrentLoc.X < FixedPlayerX)
 		{
-			float RecoverySpeed = 200.0f; // 초당 복귀 속도 (필요에 따라 조절 가능)
+			float RecoverySpeed = 200.0f; // 초당 복귀 속도
 			float NewX = FMath::Min(FixedPlayerX, CurrentLoc.X + RecoverySpeed * DeltaTime);
 			FVector NewLoc = FVector(NewX, CurrentLoc.Y, CurrentLoc.Z);
 			PlayerPawn->SetActorLocation(NewLoc, false, nullptr, ETeleportType::TeleportPhysics);
 		}
 	}
-	else
+	else if (!CurrentLevelName.Equals(TEXT("Bridge_Tutorial"), ESearchCase::IgnoreCase))
 	{
-		// 플레이어가 파괴되었다면 게임 오버 처리
+		// 플레이어가 파괴되었다면 게임 오버 처리 (튜토리얼이 아닐 때만)
 		EndGame();
 		return;
 	}
+
+	// 튜토리얼 맵인 경우 가속 및 점수 로직만 스킵
+	if (CurrentLevelName.Equals(TEXT("Bridge_Tutorial"), ESearchCase::IgnoreCase)) return;
 
 	// 타이머 누적 (속도 증가 로직)
 	TimerCount += DeltaTime;

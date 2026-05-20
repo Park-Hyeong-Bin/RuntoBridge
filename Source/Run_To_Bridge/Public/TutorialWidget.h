@@ -32,4 +32,5 @@ private:
 	
 	// 입력 감지 플래그
 	bool bMoved;
+	bool bJumped;
 };
