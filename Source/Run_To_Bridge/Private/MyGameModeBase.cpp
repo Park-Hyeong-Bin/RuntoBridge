@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MenuWidget.h"
 #include "StartWidget.h"
+#include "TutorialWidget.h"
 #include "Components/TextBlock.h"
 
 AMyGameModeBase::AMyGameModeBase()
@@ -49,6 +50,29 @@ void AMyGameModeBase::BeginPlay()
 			}
 		}
 		// 메뉴 맵에서는 게임 로직 관련 초기화(커서 숨김, 플레이어 좌표 저장 등)를 하지 않음
+		return;
+	}
+
+	// 튜토리얼 맵인 경우
+	if (CurrentLevelName.Equals(TEXT("Bridge_Tutorial"), ESearchCase::IgnoreCase))
+	{
+		// 입력 모드를 게임과 UI 모두 가능하도록 설정 (이동 + 위젯 상호작용)
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
+		{
+			PC->bShowMouseCursor = false;
+			FInputModeGameAndUI InputMode;
+			PC->SetInputMode(InputMode);
+		}
+
+		if (tutorialWidgetClass)
+		{
+			UTutorialWidget* tutorialUI = CreateWidget<UTutorialWidget>(GetWorld(), tutorialWidgetClass);
+			if (tutorialUI)
+			{
+				tutorialUI->AddToViewport();
+			}
+		}
 		return;
 	}
 

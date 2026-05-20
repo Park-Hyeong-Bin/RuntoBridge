@@ -2,8 +2,10 @@
 
 
 #include "StartWidget.h"
+#include "TutorialWidget.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
+#include "MyGameModeBase.h"
 
 void UStartWidget::NativeConstruct()
 {
@@ -40,9 +42,11 @@ void UStartWidget::StartGame()
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Stage1"));
 }
 
+
 void UStartWidget::StartTutorial()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), TEXT("tutorial"));
+	// 튜토리얼 전용 레벨로 이동
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Bridge_Tutorial"));
 }
 
 void UStartWidget::Quit()

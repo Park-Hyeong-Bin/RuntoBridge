@@ -23,6 +23,10 @@ public:
 	
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* buttonQuit;
+
+	// 튜토리얼 위젯 클래스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class UTutorialWidget> tutorialWidgetClass;
 	
 protected:
 	virtual void NativeConstruct() override;
