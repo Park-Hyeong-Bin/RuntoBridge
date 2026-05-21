@@ -63,9 +63,19 @@ void AFloorFactory::SpawnFloor()
 	}
 	else
 	{
-		// 2. 랜덤으로 새로운 바닥 선택
-		int32 RandomIndex = FMath::RandRange(0, FloorClasses.Num() - 1);
-		ClassToSpawn = FloorClasses[RandomIndex];
+		// 2. 랜덤으로 새로운 바닥 선택 (이전 바닥과 겹치지 않도록 반복)
+		if (FloorClasses.Num() > 1)
+		{
+			do
+			{
+				int32 RandomIndex = FMath::RandRange(0, FloorClasses.Num() - 1);
+				ClassToSpawn = FloorClasses[RandomIndex];
+			} while (ClassToSpawn == LastSpawnedClass);
+		}
+		else
+		{
+			ClassToSpawn = FloorClasses[0];
+		}
 
 		// 3. 만약 선택된 클래스가 SpecialConsecutiveClasses 배열에 포함되어 있다면 연속 스폰 카운트 설정
 		if (ClassToSpawn && SpecialConsecutiveClasses.Contains(ClassToSpawn))
@@ -78,6 +88,9 @@ void AFloorFactory::SpawnFloor()
 
 	if (ClassToSpawn)
 	{
+		// 다음에 뽑을 때 참고할 수 있도록 현재 클래스 저장
+		LastSpawnedClass = ClassToSpawn;
+
 		FVector SpawnLocation = GetActorLocation();
 		FRotator SpawnRotation = GetActorRotation();
 

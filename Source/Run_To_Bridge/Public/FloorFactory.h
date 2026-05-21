@@ -50,6 +50,10 @@ private:
 	UPROPERTY()
 	AActor* LastSpawnedFloor;
 
+	// 마지막으로 생성된 바닥의 클래스를 기억합니다 (중복 방지용)
+	UPROPERTY()
+	TSubclassOf<AActor> LastSpawnedClass;
+
 	// 현재 남은 연속 스폰 횟수
 	int32 ConsecutiveSpawnCount = 0;
 
