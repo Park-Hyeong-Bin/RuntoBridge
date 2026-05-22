@@ -25,4 +25,12 @@ public:
 	// 점수 UI 갱신 변수
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* scoreData;
+
+	// 최고 기록 텍스트 라벨 (예: "최고 기록 : ")
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* bestScoreText;
+
+	// 최고 기록 데이터 표시 변수
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* bestScoreData;
 };

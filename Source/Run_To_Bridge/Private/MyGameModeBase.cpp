@@ -17,6 +17,7 @@ AMyGameModeBase::AMyGameModeBase()
 
 	// 초기값 설정
 	Score = 0;
+	BestScore = 0;
 	CurrentSpeed = 1.5f;           // 시작 속도 1.5배속
 	SpeedIncreaseAmount = 0.1f;    // 10%씩 증가
 	SpeedIncreaseInterval = 20.0f; // 20초마다
@@ -106,6 +107,9 @@ void AMyGameModeBase::BeginPlay()
 		if (mainUI)
 		{
 			mainUI->AddToViewport();
+			
+			// 최고 기록 로드 및 UI 초기화
+			LoadBestScore();
 			UpdateScoreUI();
 		}
 	}
@@ -183,15 +187,35 @@ void AMyGameModeBase::AddScore(int32 Amount)
 	if (bIsGameOver) return;
 
 	Score += Amount;
+
+	// 최고 기록 실시간 업데이트
+	if (Score > BestScore)
+	{
+		BestScore = Score;
+	}
 	
 	UpdateScoreUI();
 }
 
 void AMyGameModeBase::UpdateScoreUI()
 {
-	if (mainUI && mainUI->scoreData)
+	if (mainUI)
 	{
-		mainUI->scoreData->SetText(FText::AsNumber(Score));
+		if (mainUI->scoreData)
+		{
+			mainUI->scoreData->SetText(FText::AsNumber(Score));
+		}
+
+		if (mainUI->bestScoreData)
+		{
+			mainUI->bestScoreData->SetText(FText::AsNumber(BestScore));
+		}
+
+		// 라벨 초기화 (필요시)
+		if (mainUI->bestScoreText)
+		{
+			mainUI->bestScoreText->SetText(FText::FromString(TEXT("내 최고 기록")));
+		}
 	}
 }
 
@@ -200,6 +224,9 @@ void AMyGameModeBase::EndGame()
 	if (bIsGameOver) return;
 
 	bIsGameOver = true;
+
+	// 최고 기록 저장
+	SaveBestScore();
 
 	// 게임 일시정지
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
@@ -235,4 +262,22 @@ void AMyGameModeBase::ShowMenu()
 			}
 		}
 	}
+}
+
+void AMyGameModeBase::LoadBestScore()
+{
+	// Game.ini 파일의 [Score] 섹션에서 BestScore 값을 읽어옵니다.
+	if (!GConfig->GetInt(TEXT("Score"), TEXT("BestScore"), BestScore, GGameIni))
+	{
+		BestScore = 0;
+	}
+}
+
+void AMyGameModeBase::SaveBestScore()
+{
+	// Game.ini 파일의 [Score] 섹션에 BestScore 값을 기록합니다.
+	GConfig->SetInt(TEXT("Score"), TEXT("BestScore"), BestScore, GGameIni);
+	
+	// 변경사항을 즉시 파일에 저장(Flush)합니다.
+	GConfig->Flush(false, GGameIni);
 }

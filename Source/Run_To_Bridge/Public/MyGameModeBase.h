@@ -47,6 +47,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
 	int32 Score;
 
+	// 최고 점수
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
+	int32 BestScore;
+
+	// 최고 점수 로드 함수
+	void LoadBestScore();
+
+	// 최고 점수 저장 함수
+	void SaveBestScore();
+
 	// 현재 게임 속도 배율
 	UPROPERTY(BlueprintReadWrite, Category = "GameSpeed")
 	float CurrentSpeed;
